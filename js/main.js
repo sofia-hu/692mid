@@ -14,7 +14,7 @@ var Stamen_TonerLite = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{
   ext: 'png'
 }).addTo(map);
 
-var dataset = "https://raw.githubusercontent.com/sofia-hu/692mid/master/data/map.geojson"
+var dataset = "https://raw.githubusercontent.com/sofia-hu/692mid/master/data/miami.geojson"
 var featureGroup;
 
 var myStyle = function(feature) {
@@ -38,8 +38,8 @@ $(document).ready(function() {
   $.ajax(dataset).done(function(data) {
     var parsedData = JSON.parse(data);
     featureGroup = L.geoJson(parsedData,{
-      //style: myStyle,
-      //filter: myFilter
+      style: myStyle,
+      filter: myFilter
     }
   ).addTo(map);
   });
