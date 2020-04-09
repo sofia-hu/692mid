@@ -14,7 +14,7 @@ var Stamen_TonerLite = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{
   ext: 'png'
 }).addTo(map);
 
-var dataset = "data/ppr_districts_2018.geojson"
+var dataset = "https://raw.githubusercontent.com/sofia-hu/692mid/master/data/map.geojson"
 var featureGroup;
 
 var myStyle = function(feature) {
