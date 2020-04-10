@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <!-- CSS Imports -->
   <link rel="stylesheet" href="css/reset.css" />
-  <link rel="stylesheet" href="css/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -21,26 +21,36 @@
   <div id="map" class="map" style="position: absolute; top:0; height: 100%; right: 0; left: 400"></div>
 
   <!-- Legend -->
-  <div class="legend" id="legendbar" style="position: absolute; bottom:0; width: 200px; height: 20%; right: 400; left: 400">
-  <h4 id="legendtitle">Legend</h4>
+  <!-- <div class="legend" id="legendbar" style="position: absolute; bottom:0; width: 200px; height: 20%; right: 400; left: 400"> -->
+  <!-- <h4 id="legendtitle">Legend</h4> -->
   <!-- color -->
-  <p id="description">This is the description</p>
-  </div>
+  <!-- <p id="description">This is the description</p> -->
+  <!-- </div> -->
 
     <!-- Javascript Imports -->
     <script src="js/jquery-2.2.0.js"></script>
     <script src="js/underscore.js"></script>
-    <script src="js/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
     <script src="js/main.js"></script>
 
   <script>
     var slides = [
-      { title: "title1", description: "the first description", color: "#FFFF00" },
-      { title: "title2", description: "the second description", color: "#FF00FF" },
-      { title: "title3", description: "the first description", color: "#00FFFF" },
-      { title: "made up title", description: "made up description", color: "#F0F0F0"}
+      { title: "Miami 2010 Census", description: "The decennial census data is a good starting point for urban planners to get a general understanding of their target cities. The map on the right shows the population distribution in Miami based on the 2010 census results. Census tracts with a total population of more than 4000 people are displayed in blue shade.", color: "#F0F0F0" , fly:false, filter:myFilter, style:myStyle},
+      { title: "Household", description: "The household distribution in Miami is more concentrated than the population. Census tracts with a total household number of more than 2000 are displayed in yellow shade.", color: "#F0F0F0", fly:false, filter:myFilter1, style:myStyle1 },
+      { title: "White Population", description: "The distribution of White population in Miami is concentrated along the coast. Census tracts with a white population of more than 600 people are displayed in green shade.", color: "#F0F0F0" ,  fly:false, filter:myFilter2, style:myStyle2},
+      { title: "African American Population", description: "The distribution of African American population is concentrated in the north-eastern part of Miami. Census tracts with a African American population of more than 600 people are displayed in purple shade.", color: "#F0F0F0", fly:false, filter:myFilter3, style:myStyle3},
+      { title: "Hispanic Population", description: "The distribution of hispanic population in Miami is concentrated in the western part of the city. Census tracts with a hispanic population of more than 2000 people are displayed in red shade. There are comparatively less hispanic residents in the center city.", color: "#F0F0F0", fly:true, filter:myFilter4, style:myStyle4},
     ]
     var currentSlide = 0
+
+    var flyto = function(fly){
+      if(fly==true){
+      map.flyTo([25.772101, -80.192409], 14);
+      }
+      else{
+      map.flyTo([25.779867, -80.223289], 12);
+      }
+      };
 
     var hidePrevious = function() {
       if (currentSlide == 0){
@@ -65,20 +75,37 @@
       }
     }
 
+    var featureGroup
+
     var loadSlide = function(slide) {
       //load all data
       $('#title').text(slide.title)
       $('#description').text(slide.description)
       $('#sidebar').css("background-color", slide.color)
-      //filter
+      $(document).ready(function() {
+          $.ajax(dataset).done(function(data) {
+          var parsedData = JSON.parse(data);
+          featureGroup = L.geoJson(parsedData,{
+            style: slide.style,
+            filter: slide.filter
+          }
+        ).addTo(map);
+        });
+      });
+      flyto(slide.fly);
     }
     loadSlide(slides[currentSlide])
+
+    var removeSlide = function(slide){
+      map.removeLayer(slide);
+    }
 
     var next = function() {
       if (currentSlide == slides.length - 1) {
       } else {
         $('#nextButton').show()
         currentSlide = currentSlide + 1
+        removeSlide(featureGroup)
         loadSlide(slides[currentSlide])
       }
 
@@ -104,6 +131,7 @@
       } else {
         $('#previousButton').show()
         currentSlide = currentSlide - 1
+        removeSlide(featureGroup)
         loadSlide(slides[currentSlide])
       }
   hidePrevious()
